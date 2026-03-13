@@ -341,9 +341,11 @@ export default function Home() {
               )}
               {!productsLoading && !productsError &&
                 stillLookingProducts.map((product) => (
-                  <div
+                  <Link
                     key={`${product.slug}-still-looking`}
-                    className="min-w-[200px] rounded-2xl bg-white text-[#1f1f1f] shadow-sm"
+                    href={`/product/${product.slug}`}
+                    prefetch
+                    className="min-w-[200px] rounded-2xl bg-white text-[#1f1f1f] shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                   >
                     <Image
                       src={product.image}
@@ -355,8 +357,9 @@ export default function Home() {
                     />
                     <div className="px-3 py-3">
                       <p className="text-sm font-semibold uppercase tracking-wide text-[#1f1f1f]">{product.brand}</p>
+                      <p className="text-xs text-[#6b7280] line-clamp-2">{product.title}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
             </div>
           </div>

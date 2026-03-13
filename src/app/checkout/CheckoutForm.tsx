@@ -8,7 +8,8 @@ import type { CartItem } from "@/types/cart";
 
 const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 
-const MAX_POSTAL_LENGTH = 10;
+const MAX_POSTAL_LENGTH = 6;
+const MAX_PHONE_LENGTH = 10;
 
 const emptyForm = {
   shippingName: "",
@@ -174,10 +175,13 @@ export default function CheckoutForm({ items, userName, userEmail }: Props) {
                   <input
                     required
                     value={form.shippingPhone}
-                    onChange={(event) => handleChange("shippingPhone", event.target.value)}
+                    onChange={(event) =>
+                      handleChange("shippingPhone", event.target.value.replace(/\D/g, "").slice(0, MAX_PHONE_LENGTH))
+                    }
                     className="mt-1 w-full rounded-[8px] border border-[#d7d7d7] px-3 py-2 text-sm text-[#111827] focus:border-[#2874f0] focus:outline-none"
                     inputMode="tel"
                     placeholder="10-digit mobile"
+                    maxLength={MAX_PHONE_LENGTH}
                   />
                 </label>
               </div>
@@ -224,10 +228,13 @@ export default function CheckoutForm({ items, userName, userEmail }: Props) {
                   <input
                     required
                     value={form.shippingPostalCode}
-                    onChange={(event) => handleChange("shippingPostalCode", event.target.value.slice(0, MAX_POSTAL_LENGTH))}
+                    onChange={(event) =>
+                      handleChange("shippingPostalCode", event.target.value.replace(/\D/g, "").slice(0, MAX_POSTAL_LENGTH))
+                    }
                     className="mt-1 w-full rounded-[8px] border border-[#d7d7d7] px-3 py-2 text-sm text-[#111827] focus:border-[#2874f0] focus:outline-none"
                     inputMode="numeric"
                     placeholder="6-digit"
+                    maxLength={MAX_POSTAL_LENGTH}
                   />
                 </label>
               </div>
