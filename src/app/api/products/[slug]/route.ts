@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { sql } from "@/lib/neon";
 
@@ -21,10 +21,10 @@ type ProductDetailRow = {
 };
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { slug: string } },
+  _request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  const slug = params.slug;
+  const { slug } = await params;
 
   try {
     const products = (await sql`
