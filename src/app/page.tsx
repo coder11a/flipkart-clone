@@ -393,7 +393,6 @@ export default function Home() {
                   />
                 ))}
             </div>
-            <ArrowButton direction="right" />
           </div>
         </section>
 
@@ -401,30 +400,6 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-[#1c1f23]">Top picks for you</h3>
-            </div>
-            <div className="hidden gap-2 sm:flex">
-              <button className="rounded-full border border-[#d8dae2] p-2 text-sm text-[#4c4f58] hover:bg-[#f4f6f9]">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 6l-6 6 6 6" />
-                </svg>
-              </button>
-              <button className="rounded-full border border-[#d8dae2] p-2 text-sm text-[#4c4f58] hover:bg-[#f4f6f9]">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
-                </svg>
-              </button>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

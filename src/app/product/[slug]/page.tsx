@@ -183,6 +183,11 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
                 {product.discountText && <span className="text-sm font-semibold text-[#059669]">{product.discountText}</span>}
               </div>
 
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#ecfdf5] px-3 py-1 text-xs font-semibold text-[#0b8a44]">
+                <span className="h-2 w-2 rounded-full bg-[#22c55e]" aria-hidden />
+                In stock · Ready to ship
+              </div>
+
               <p className="mt-4 text-sm text-[#4b5563]">{product.description}</p>
             </div>
 
