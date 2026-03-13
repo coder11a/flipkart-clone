@@ -97,44 +97,56 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
         <SiteHeaderTop containerClass={containerClass} />
       </header>
       <main className={`${containerClass} py-2`}>
-        <nav className="mb-4 flex flex-wrap items-center gap-1 text-xs text-[#6b7280] sm:text-sm">
-          <Link href="/" className="hover:text-[#2874f0]">
-            Home
-          </Link>
-          <span>/</span>
-          {product.category}
-          <span>/</span>
-          {product.subcategory}
-          <span>/</span>
-          <span className="font-semibold text-[#111827]">{product.title}</span>
-        </nav>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <section className="space-y-4 rounded-3xl bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] md:p-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
-              <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-[#fafbff] p-4">
-                <Image
-                  src={gallery[0]}
-                  alt={product.title}
-                  width={600}
-                  height={600}
-                  className="h-full w-full rounded-2xl object-cover"
-                  unoptimized
-                />
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:pb-0">
-                {gallery.slice(1, 5).map((image, index) => (
+        <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] -mt-2">
+          <section className="space-y-0 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+            <nav className="mb-3 flex flex-wrap items-center gap-1 text-xs text-[#6b7280] sm:text-sm">
+              <Link href="/" className="hover:text-[#2874f0]">
+                Home
+              </Link>
+              <span>/</span>
+              {product.category}
+              <span>/</span>
+              {product.subcategory}
+              <span>/</span>
+              <span className="font-semibold text-[#111827]">{product.title}</span>
+            </nav>
+            <div className="relative">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {gallery.slice(0, 4).map((image, index) => (
                   <div
                     key={`${image}-${index}`}
-                    className="min-w-[160px] overflow-hidden rounded-2xl border border-[#e5e7eb] bg-[#fafbff] p-2 md:min-w-0"
+                    className="group relative aspect-3/4 overflow-hidden border border-white/70 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.08)]"
                   >
-                    <Image src={image} alt={`${product.title} ${index + 2}`} width={300} height={300} className="h-full w-full rounded-xl object-cover" unoptimized />
+                    <Image
+                      src={image}
+                      alt={`${product.title} ${index + 1}`}
+                      width={500}
+                      height={700}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+                {gallery.slice(0, 4).map((image, index) => (
+                  <div
+                    key={`${image}-${index}`}
+                    className="group relative aspect-3/4 overflow-hidden border border-white/70 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.08)]"
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.title} ${index + 1}`}
+                      width={500}
+                      height={700}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[#e5e7eb] p-4">
+            <div className="border border-[#e5e7eb] p-4">
               <h3 className="text-sm font-semibold text-[#111827]">Highlights</h3>
               <ul className="mt-2 grid grid-cols-1 gap-2 text-sm text-[#4b5563] sm:grid-cols-2">
                 {product.highlights?.map((highlight) => (
@@ -147,8 +159,8 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
             </div>
           </section>
 
-          <section className="mt-6 space-y-4 lg:mt-0 lg:pl-4">
-            <div className="rounded-3xl bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] md:p-6">
+          <section className="space-y-0 lg:pl-0">
+            <div className="bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-[#9ca3af]">{product.brand}</p>
@@ -174,8 +186,8 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
               <p className="mt-4 text-sm text-[#4b5563]">{product.description}</p>
             </div>
 
-            <div className="space-y-5 rounded-3xl bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] md:p-6">
-              <div className="rounded-2xl border border-[#ebebff] bg-[#f4f6ff] p-4 text-sm text-[#1f2937]">
+            <div className="space-y-0 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] md:p-6">
+              <div className="border border-[#ebebff] bg-[#f4f6ff] p-4 text-sm text-[#1f2937]">
                 <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase text-[#6366f1]">
                   <span className="rounded-full bg-white px-2 py-0.5 text-[#6366f1]">WOW DEAL</span>
                   Apply offers for maximum savings

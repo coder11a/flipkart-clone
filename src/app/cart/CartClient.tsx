@@ -29,6 +29,8 @@ export default function CartClient({ initialItems }: Props) {
   const [banner, setBanner] = useState<BannerState | null>(null);
   const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
+  const [savingItemId, setSavingItemId] = useState<number | null>(null);
+  const [buyingItemId, setBuyingItemId] = useState<number | null>(null);
 
   const totals = useMemo(() => {
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
@@ -69,6 +71,64 @@ export default function CartClient({ initialItems }: Props) {
       setBanner({ type: "error", message: error instanceof Error ? error.message : "Something went wrong" });
     } finally {
       setUpdatingItemId(null);
+    }
+  };
+
+  const handleSaveForLater = async (item: CartItem) => {
+    setBanner(null);
+    setSavingItemId(item.id);
+    try {
+      const response = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ id: item.id }),
+      });
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(data?.message ?? "Unable to move item");
+      }
+
+      setItems((prev) => prev.filter((existing) => existing.id !== item.id));
+      setBanner({ type: "success", message: "Saved for later" });
+      window.dispatchEvent(new CustomEvent("fk:cart-updated"));
+    } catch (error) {
+      setBanner({ type: "error", message: error instanceof Error ? error.message : "Something went wrong" });
+    } finally {
+      setSavingItemId(null);
+    }
+  };
+
+  const handleBuyThisNow = async (item: CartItem) => {
+    setBanner(null);
+    setBuyingItemId(item.id);
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          productSlug: item.productSlug,
+          color: item.color,
+          size: item.size,
+          quantity: item.quantity,
+          replaceExisting: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(data?.message ?? "Unable to prepare order");
+      }
+
+      setItems([item]);
+      setBanner({ type: "success", message: "Ready to buy this item" });
+      window.dispatchEvent(new CustomEvent("fk:cart-updated"));
+    } catch (error) {
+      setBanner({ type: "error", message: error instanceof Error ? error.message : "Something went wrong" });
+    } finally {
+      setBuyingItemId(null);
     }
   };
 
@@ -118,6 +178,8 @@ export default function CartClient({ initialItems }: Props) {
           const isUpdating = updatingItemId === item.id;
           const isRemoving = removingItemId === item.id;
           const badge = DEAL_BADGES[index % DEAL_BADGES.length];
+          const isSaving = savingItemId === item.id;
+          const isBuying = buyingItemId === item.id;
           const linePrice = item.unitPrice * item.quantity;
           const lineMrp = Math.max(linePrice + 200, Math.round(linePrice * 1.25));
           const discountPercent = Math.max(5, Math.round(((lineMrp - linePrice) / lineMrp) * 100));
@@ -194,11 +256,16 @@ export default function CartClient({ initialItems }: Props) {
                 </div>
               </div>
               <div className="flex divide-x divide-[#f0f0f0] border-t border-[#f0f0f0] text-sm text-[#5f6368]">
-                <button type="button" className="flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold" disabled>
+                <button
+                  type="button"
+                  className="flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold"
+                  onClick={() => handleSaveForLater(item)}
+                  disabled={isSaving}
+                >
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M6 4h12a2 2 0 0 1 2 2v16l-8-3-8 3V6a2 2 0 0 1 2-2z" />
                   </svg>
-                  Save for later
+                  {isSaving ? "Saving..." : "Save for later"}
                 </button>
                 <button
                   type="button"
@@ -211,11 +278,16 @@ export default function CartClient({ initialItems }: Props) {
                   </svg>
                   {isRemoving ? "Removing..." : "Remove"}
                 </button>
-                <button type="button" className="flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold text-[#5f6368]">
+                <button
+                  type="button"
+                  className="flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold text-[#5f6368]"
+                  onClick={() => handleBuyThisNow(item)}
+                  disabled={isBuying}
+                >
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 2v9h9v2h-9v9h-2v-9H2v-2h9V2z" />
                   </svg>
-                  Buy this now
+                  {isBuying ? "Preparing..." : "Buy this now"}
                 </button>
               </div>
             </div>

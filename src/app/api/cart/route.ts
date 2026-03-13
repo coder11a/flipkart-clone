@@ -67,6 +67,7 @@ type AddBody = {
   color?: string;
   size?: string;
   quantity?: number;
+  replaceExisting?: boolean;
 };
 
 export async function POST(request: Request) {
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
 
     const color = sanitizeDimension(body.color);
     const size = sanitizeDimension(body.size);
+    const replaceExisting = Boolean(body.replaceExisting);
 
     const [product] = await sql`
       select slug, price
@@ -95,6 +97,13 @@ export async function POST(request: Request) {
 
     if (!product) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
+    if (replaceExisting) {
+      await sql`
+        delete from cart_items
+        where user_id = ${user.id}
+      `;
     }
 
     const [cartItem] = await sql`

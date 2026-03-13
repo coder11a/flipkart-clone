@@ -3,11 +3,13 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const inputClass =
-  "w-full rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#2874f0] focus:outline-none";
+import SiteHeaderTop from "../components/SiteHeaderTop";
+import { containerClass } from "../components/categoryContent";
 
-const cardClass =
-  "w-full max-w-md rounded-3xl border border-[#e5e7eb] bg-white/90 p-8 shadow-[0_15px_55px_rgba(15,23,42,0.12)] backdrop-blur";
+const inputClass =
+  "w-full border-b border-[#d1d5db] bg-transparent py-3 text-sm text-[#111111] placeholder:text-[#9e9e9e] focus:border-[#2874f0] focus:outline-none";
+
+const cardSectionClass = "w-full p-8 sm:p-10";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -17,8 +19,11 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<{ type: "idle" | "loading" | "success" | "error"; message?: string }>({ type: "idle" });
 
-  const heading = mode === "login" ? "Welcome back" : "Create your account";
-  const subheading = mode === "login" ? "Log in to continue shopping" : "Join Flipkart to explore exclusive deals";
+  const heading = mode === "login" ? "Login" : "Sign up";
+  const subheading =
+    mode === "login"
+      ? "Get access to your Orders, Wishlist and Recommendations"
+      : "Join Flipkart to explore exclusive deals";
 
   const toggleMode = () => {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
@@ -57,38 +62,36 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-linear-to-br from-[#eef2ff] via-[#f8fbff] to-[#e0f2fe] px-4 py-10">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-stretch">
-        <div className="flex-1 rounded-[32px] bg-[radial-gradient(circle_at_top,#2874f0,#1a2980)] p-10 text-white shadow-2xl">
-          <p className="text-sm uppercase tracking-[0.3em] text-white/80">Flipkart Exclusive</p>
-          <h1 className="mt-6 text-4xl font-semibold leading-tight">Unlock member-only prices & perks</h1>
-          <ul className="mt-8 space-y-4 text-lg text-white/80">
-            <li className="flex items-start gap-3">
-              <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">1</span>
-              Discover curated deals crafted for you
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">2</span>
-              Track orders seamlessly across devices
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">3</span>
-              Save your wishlists and checkout faster
-            </li>
-          </ul>
-        </div>
+    <div className="flex min-h-screen flex-col bg-[#f1f3f6]">
+      <header className="border-b border-[#e5e7eb] bg-white/95 backdrop-blur">
+        <SiteHeaderTop containerClass={containerClass} />
+      </header>
 
-        <div className={cardClass}>
-          <div className="space-y-1 text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-[#9ca3af]">{mode === "login" ? "Login" : "Sign up"}</p>
-            <h2 className="text-2xl font-semibold text-[#0f172a]">{heading}</h2>
-            <p className="text-sm text-[#64748b]">{subheading}</p>
+      <main className="flex flex-1 items-center justify-center px-4 py-10">
+        <div className="flex w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-[0_10px_45px_rgba(15,23,42,0.08)]">
+          <div className="hidden w-[40%] flex-col justify-between bg-[#2874f0] p-10 text-white md:flex">
+            <div>
+              <p className="text-xl font-semibold">Login</p>
+              <p className="mt-3 text-sm text-white/90">{subheading}</p>
+            </div>
+            <div className="mt-10 flex flex-1 items-center justify-center">
+              <img src="/assets/1.webp" alt="Login illustration" className="max-h-48 w-full object-contain" />
+            </div>
+            <p className="mt-10 text-sm text-white/80">Secure access to your Flipkart account</p>
           </div>
 
-          <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+          <div className={cardSectionClass}>
+            <form className="mx-auto max-w-sm space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#b3b3b3]">{heading}</p>
+              <p className="mt-2 text-2xl font-semibold text-[#1f1f1f]">
+                {mode === "login" ? "Enter Email / Mobile number" : "Create your account"}
+              </p>
+            </div>
+
             {mode === "signup" && (
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-[#1f2937]" htmlFor="name">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-widest text-[#9e9e9e]" htmlFor="name">
                   Name
                 </label>
                 <input
@@ -104,8 +107,8 @@ export default function AuthPage() {
               </div>
             )}
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-[#1f2937]" htmlFor="email">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest text-[#9e9e9e]" htmlFor="email">
                 Email
               </label>
               <input
@@ -120,8 +123,8 @@ export default function AuthPage() {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-[#1f2937]" htmlFor="password">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest text-[#9e9e9e]" htmlFor="password">
                 Password
               </label>
               <input
@@ -136,28 +139,36 @@ export default function AuthPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={status.type === "loading"}
-              className="mt-6 w-full rounded-2xl bg-[#2874f0] px-4 py-3 text-base font-semibold text-white transition hover:bg-[#1956b5] disabled:cursor-not-allowed disabled:bg-[#6b7280]"
-            >
-              {status.type === "loading" ? "Please wait" : mode === "login" ? "Log in" : "Create account"}
-            </button>
-          </form>
+            <p className="text-xs text-[#9e9e9e]">
+              By continuing, you agree to Flipkart&apos;s
+              <a href="#" className="px-1 text-[#2874f0]">Terms of Use</a>
+              and
+              <a href="#" className="pl-1 text-[#2874f0]">Privacy Policy</a>.
+            </p>
 
-            <div className="mt-4 text-center text-sm text-[#475569]">
+              <button
+                type="submit"
+                disabled={status.type === "loading"}
+                className="w-full rounded-sm bg-[#fb641b] py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#e55a15] disabled:cursor-not-allowed disabled:bg-[#f4a482]"
+              >
+                {status.type === "loading" ? "Please wait" : mode === "login" ? "Log in" : "Create account"}
+              </button>
+            </form>
+
+            <div className="mx-auto mt-6 max-w-sm text-center text-sm text-[#475569]">
               {status.type === "error" && <p className="text-[#dc2626]">{status.message}</p>}
               {status.type === "success" && <p className="text-[#16a34a]">{status.message}! Redirecting…</p>}
             </div>
 
-          <div className="mt-6 text-center text-sm text-[#475569]">
-            {mode === "login" ? "Don't have an account?" : "Already have an account?"}&nbsp;
-            <button type="button" onClick={toggleMode} className="font-semibold text-[#2874f0] hover:underline">
-              {mode === "login" ? "Create one" : "Log in"}
-            </button>
+            <div className="mx-auto mt-6 max-w-sm text-center text-sm text-[#2874f0]">
+              {mode === "login" ? "New to Flipkart?" : "Already have an account?"}&nbsp;
+              <button type="button" onClick={toggleMode} className="font-semibold">
+                {mode === "login" ? "Create an account" : "Log in"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

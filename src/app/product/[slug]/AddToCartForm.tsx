@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 const MAX_QUANTITY = 10;
@@ -12,9 +12,9 @@ type Props = {
   sizeOptions?: string[] | null;
 };
 
-type RequestState = {
-  status: "idle" | "success" | "error";
-  message: string | null;
+type ToastState = {
+  variant: "success" | "error";
+  message: string;
 };
 
 const normalizeOptions = (values?: string[] | null, fallbackLabel?: string) => {
@@ -33,7 +33,8 @@ export default function AddToCartForm({ productSlug, price, colorOptions, sizeOp
   const [selectedColor, setSelectedColor] = useState(colors[0] ?? "");
   const [selectedSize, setSelectedSize] = useState(sizes[0] ?? "");
   const [quantity, setQuantity] = useState(1);
-  const [requestState, setRequestState] = useState<RequestState>({ status: "idle", message: null });
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const [pendingAction, setPendingAction] = useState<"add" | "buy" | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const subtotal = useMemo(() => quantity * price, [quantity, price]);
@@ -47,35 +48,61 @@ export default function AddToCartForm({ productSlug, price, colorOptions, sizeOp
     setQuantity(clampedQuantity(value));
   };
 
-  const handleAddToCart = () => {
-    setRequestState({ status: "idle", message: null });
+  useEffect(() => {
+    if (!toast) return;
+    const timeoutId = window.setTimeout(() => setToast(null), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [toast]);
+
+  const showToast = (message: string, variant: ToastState["variant"]) => {
+    setToast({ message, variant });
+  };
+
+  const submitCart = (action: "add" | "buy") => {
+    setPendingAction(action);
     startTransition(async () => {
       try {
+        const payload: Record<string, unknown> = {
+          productSlug,
+          color: selectedColor,
+          size: selectedSize,
+          quantity,
+        };
+        if (action === "buy") {
+          payload.replaceExisting = true;
+        }
+
         const response = await fetch("/api/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "same-origin",
-          body: JSON.stringify({
-            productSlug,
-            color: selectedColor,
-            size: selectedSize,
-            quantity,
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
           const data = (await response.json().catch(() => null)) as { message?: string } | null;
-          throw new Error(data?.message ?? "Unable to add to cart");
+          const message = data?.message ?? "Unable to add to cart";
+          throw new Error(message);
         }
 
-        setRequestState({ status: "success", message: "Added to cart" });
         window.dispatchEvent(new CustomEvent("fk:cart-updated"));
-        router.refresh();
+        if (action === "buy") {
+          router.push("/cart");
+        } else {
+          showToast("Added to cart", "success");
+          router.refresh();
+        }
       } catch (error) {
-        setRequestState({ status: "error", message: error instanceof Error ? error.message : "Something went wrong" });
+        const message = error instanceof Error ? error.message : "Something went wrong";
+        showToast(message, "error");
+      } finally {
+        setPendingAction(null);
       }
     });
   };
+
+  const handleAddToCart = () => submitCart("add");
+  const handleBuyNow = () => submitCart("buy");
 
   const colorLabel = colors.length ? "Choose color" : "Color";
   const sizeLabel = sizes.length ? "Choose size" : "Size";
@@ -172,16 +199,6 @@ export default function AddToCartForm({ productSlug, price, colorOptions, sizeOp
         <p className="mt-1 text-xs text-[#6b7280]">Inclusive of taxes, shipping calculated at checkout.</p>
       </div>
 
-      {requestState.message && (
-        <div
-          className={`rounded-2xl border px-4 py-3 text-sm ${
-            requestState.status === "error" ? "border-[#fca5a5] bg-[#fef2f2] text-[#b91c1c]" : "border-[#bbf7d0] bg-[#ecfdf5] text-[#166534]"
-          }`}
-        >
-          {requestState.message}
-        </div>
-      )}
-
       <div className="sticky bottom-0 left-0 right-0 z-20">
         <div className="flex flex-col gap-2 rounded-3xl bg-white/95 p-3 shadow-[0_10px_25px_rgba(15,23,42,0.1)] backdrop-blur sm:flex-row sm:items-center sm:gap-3">
           <button
@@ -195,11 +212,28 @@ export default function AddToCartForm({ productSlug, price, colorOptions, sizeOp
           <button
             className="flex-1 rounded-2xl bg-[#ffe259] px-4 py-3 text-base font-semibold text-[#111827] shadow-inner transition hover:from-[#ffd148] hover:to-[#ff9f43]"
             type="button"
+            onClick={handleBuyNow}
+            disabled={isPending}
           >
-            Buy at ₹{price.toLocaleString("en-IN")}
+            {pendingAction === "buy" && isPending ? "Processing..." : `Buy at ₹${price.toLocaleString("en-IN")}`}
           </button>
         </div>
       </div>
+      {toast && (
+        <div className="pointer-events-none fixed left-1/2 top-4 z-50 w-full max-w-md -translate-x-1/2 px-4">
+          <div
+            className={`pointer-events-auto rounded-2xl px-4 py-3 text-sm font-semibold shadow-lg ${
+              toast.variant === "success"
+                ? "border border-[#bbf7d0] bg-white text-[#166534]"
+                : "border border-[#fecaca] bg-white text-[#b91c1c]"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
