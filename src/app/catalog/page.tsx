@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useMemo } from "react";
+import { Suspense, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import ProductCard from "../components/ProductCard";
@@ -77,7 +77,20 @@ const EmptyState = ({ message }: { message: string }) => (
   </div>
 );
 
-export default function CatalogPage() {
+const CatalogLoadingState = () => (
+  <div className="min-h-screen bg-white text-[#1f1f1f]">
+    <header className="sticky top-0 z-30 border-b border-[#e5e7eb] bg-white/95 backdrop-blur">
+      <SiteHeaderTop containerClass={containerClass} />
+    </header>
+    <main className={`${containerClass} space-y-8 py-8`}>
+      <div className="rounded-3xl border border-dashed border-[#d1d5db] p-6 text-center text-sm text-[#6b7280]">
+        Loading catalog...
+      </div>
+    </main>
+  </div>
+);
+
+function CatalogContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category") ?? undefined;
@@ -224,5 +237,13 @@ export default function CatalogPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={<CatalogLoadingState />}>
+      <CatalogContent />
+    </Suspense>
   );
 }
