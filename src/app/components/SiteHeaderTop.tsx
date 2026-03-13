@@ -251,7 +251,7 @@ export default function SiteHeaderTop({ containerClass }: { containerClass: stri
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-md font-medium text-[#3b3d43]">
+          <div className="ml-auto flex items-center gap-2 text-md font-medium text-[#3b3d43] text-right">
             <div className="flex items-center gap-2 text-sm text-[#4d4f59]">
               <svg className="h-4 w-4 text-[#183b56]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 21c4.2-3.5 7-7.4 7-11.2A7 7 0 0 0 5 9.8C5 13.6 7.8 17.5 12 21Z" />
